@@ -1,0 +1,4 @@
+corpus
+.vscode
+scrapy
+*.pyc
