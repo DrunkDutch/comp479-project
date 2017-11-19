@@ -1,0 +1,12 @@
+{
+    "spiderStartUrl": [
+        "https://csu.qc.ca/content/student-groups-associations",
+        "https://www.concordia.ca/artsci/students/associations.html",
+        "http://www.cupfa.org",
+        "http://cufa.net"
+    ],
+    "spiderResult": "./corpus",
+    "spiderDocumentPrefix": "corpus",
+    "spiderDocumentFetchLimit": 10,
+    "spiderTimeOut": 120
+}

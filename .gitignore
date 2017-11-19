@@ -1,3 +1,4 @@
 corpus
 .vscode
 scrapy
+*.pyc
