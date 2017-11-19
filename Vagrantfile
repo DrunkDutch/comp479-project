@@ -64,8 +64,9 @@ Vagrant.configure("2") do |config|
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
   config.vm.provision "shell", inline: <<-SHELL
-    apt-get update
-    sudo apt-get -y install python-dev python-pip libxml2-dev libxslt1-dev zlib1g-dev libffi-dev libssl-dev
-    sudo pip install scrapy
+    # apt-get update
+    sudo apt install -y python3-pip python-pip
+    sudo pip3 install numpy nltk
+    sudo pip install numpy nltk
   SHELL
 end
