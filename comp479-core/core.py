@@ -31,10 +31,13 @@ class Corpus:
         with open(self.sentiment_loc, 'rb') as myfile:
             next_line = myfile.readline()
             while next_line:
-                key = self.clean(next_line.split("\t")[0])
-                score = int(next_line.split("\t")[1].strip())
-                sent_list[key] = score
-                next_line = myfile.readline()
+                try:
+                    key = self.clean(str(next_line.split("\t")[0]))
+                    score = int(next_line.split("\t")[1].strip())
+                    sent_list[key] = score
+                    next_line = myfile.readline()
+                except UnicodeDecodeError:
+                    next_line = myfile.readline()
         with open("senti.pk1", "wb") as dill:
             pickle.dump(sent_list, dill, pickle.HIGHEST_PROTOCOL)
         return sent_list
@@ -242,11 +245,13 @@ class Document:
                 if stemmed_word in self.sentiments:
                     self.score += self.sentiments[stemmed_word]
             except UnicodeDecodeError:
-                token_list.append((word.split(".")[0], self.id))
-                self.count += 1
+                # token_list.append((word.split(".")[0], self.id))
+                # self.count += 1
+                continue
             except UnicodeEncodeError:
-                token_list.append((word, self.id))
-                self.count += 1
+                # token_list.append((word, self.id))
+                # self.count +=
+                continue
         cleaned = token_list
         return cleaned
 
@@ -354,7 +359,7 @@ install stopwords corpus for nltk to remove stopwords
 if __name__ == "__main__":
     now = datetime.datetime.now()
     corp = SerialCorpus.load("corpus_pickle.pk1")
-    # print corp.documents['67']
+    print corp.documents[1]
     # corpus = Corpus("./../Corpus", digits=True, stop=True, case=True)
     # # print len(corpus.documents)
     # for index, doc in enumerate(corpus.documents):
