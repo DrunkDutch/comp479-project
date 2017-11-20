@@ -4,6 +4,7 @@ import re
 import string
 import cPickle as pickle
 import datetime
+import json
 
 
 class Corpus:
@@ -13,7 +14,7 @@ class Corpus:
     """
     def __init__(self, source, case=False, digits=False, stop=False, stem=False, sentiment="./../AFINN-111.txt"):
         self.path = source
-        self.files = [os.path.join(self.path, file) for file in os.listdir(self.path) if file.endswith(".sgm")]
+        self.files = [os.path.join(self.path, file) for file in os.listdir(self.path) if file.endswith(".json")]
         self.case = case
         self.digits = digits
         self.stop = stop
@@ -59,10 +60,9 @@ class Corpus:
         doc = []
         for file in self.files:
             print "Currently parsing articles from file {}", file
-            with open(file, 'rb') as myfile:
-                data = myfile.read()
-            for article in Document.parse_tags("REUTERS", data, False):
-                    doc.append(Document(article, case=self.case, digits=self.digits, stem=self.stem, stop=self.stop, sentiments=self.sentiment))
+            with open(file, 'r') as myfile:
+                data = json.loads(myfile.read())
+                doc.append(Document(data, id=int(filter(str.isdigit, file)), case=self.case, digits=self.digits, stem=self.stem, stop=self.stop, sentiments=self.sentiment))
         return doc
 
     def save(self):
@@ -135,14 +135,14 @@ class SerialCorpus:
 
 class Document:
 
-    def __init__(self, source, case=True, digits=True, stop=True, stem=True, sentiments={}):
-        self.raw = self.parse_tags("REUTERS", source, False)[0]
-        self.id = self.get_id()
+    def __init__(self, source, id, case=True, digits=True, stop=True, stem=True, sentiments={}):
+        self.raw = source
+        self.id = id
         self.topics_places = self.parse_tags("D", self.raw)
-        self.text = self.parse_tags("TEXT", self.raw, False)[0]
-        self.title = self.parse_tags("TITLE", self.text)[0]
-        self.dateline = self.parse_tags("DATELINE", self.text)[0]
-        self.body = self.get_body()
+        self.text = self.raw['content']
+        self.title = self.raw['url']
+        # self.dateline = self.parse_tags("DATELINE", self.text)[0]
+        self.body = self.text
         self.sentiments = sentiments
         self.case = case
         self.digits = digits
@@ -243,6 +243,9 @@ class Document:
                     self.score += self.sentiments[stemmed_word]
             except UnicodeDecodeError:
                 token_list.append((word.split(".")[0], self.id))
+                self.count += 1
+            except UnicodeEncodeError:
+                token_list.append((word, self.id))
                 self.count += 1
         cleaned = token_list
         return cleaned
@@ -351,7 +354,7 @@ install stopwords corpus for nltk to remove stopwords
 if __name__ == "__main__":
     now = datetime.datetime.now()
     corp = SerialCorpus.load("corpus_pickle.pk1")
-    print corp.documents['67']
+    # print corp.documents['67']
     # corpus = Corpus("./../Corpus", digits=True, stop=True, case=True)
     # # print len(corpus.documents)
     # for index, doc in enumerate(corpus.documents):
