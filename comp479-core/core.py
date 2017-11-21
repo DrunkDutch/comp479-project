@@ -349,6 +349,21 @@ class Term:
     def __str__(self):
         return '{} {}'.format(self.term, self.score)
 
+    def __ne__(self, other):
+        return self.term != other.term
+
+    def __lt__(self, other):
+        return self.term < other.term
+
+    def __le__(self, other):
+        return self.term <= other.term
+
+    def __gt__(self, other):
+        return self.term > other.term
+
+    def __ge__(self, other):
+        return self.term >= other.term
+
 
 """
 Install punkt package from nltk to be able to tokenize english

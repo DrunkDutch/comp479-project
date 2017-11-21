@@ -11,6 +11,7 @@ import datetime
 from collections import defaultdict
 from math import log10
 import cPickle as pickle
+import json
 
 
 class QueryProcessor:
@@ -83,7 +84,11 @@ class QueryProcessor:
         except Exception:
             print "woops, Couldn't delete folders in output locations"
         if not os.path.exists(self.out_dir):
-            os.makedirs(self.out_dir)
+            try:
+                os.makedirs(self.out_dir)
+            except Exception:
+                print "Folder already exists"
+
 
     def get_index(self):
         """
@@ -138,16 +143,19 @@ class QueryProcessor:
                 else:
                     score = 0
                 term = core.Term(termi, score)
+                print term
                 postings.append(set(self.index[term]))
                 idf_values[term] = self.get_idf(list(set(self.index[term])))
                 document_list = set(self.index[term])
                 for docId in sorted(document_list):
                     frequency = self.get_document_freq(term, docId)
                     if str(docId) not in doc_weight:
-                        doc_weight[str(docId)] = self.calculate_score(idf_values[term], frequency, docId)
+                        doc_score = self.calculate_score(idf_values[term], frequency, docId)
+                        doc_weight[str(docId)] = doc_score
                     else:
                         doc_weight[str(docId)] += self.calculate_score(idf_values[term], frequency, docId)
             except KeyError:
+                print "Key error"
                 postings.append(set([]))
         union = set.union(*postings)
         returnDict = {}
@@ -183,21 +191,23 @@ class QueryProcessor:
         for article in articles:
             score = article[1]
             article = int(article[0])
-            corp_file = article / 1000
+            corp_file = (article / 1000) + 1
             art_index = (article % 1000) - 1
             if corp_file < 10:
-                file_name = "reut2-00" + str(corp_file) + ".sgm"
+                file_name = "corpus" + str(corp_file) + ".json"
             else:
-                file_name = "reut2-0" + str(corp_file) + ".sgm"
+                file_name = "corpus" + str(corp_file) + ".json"
             with open(os.path.join(self.corpus, file_name), "r") as reut:
-                data = reut.read()
-            doc_dump = core.Document.parse_tags("REUTERS", data, False)
-            for index, doc in enumerate(doc_dump):
-                if index == art_index:
-                    print "Found result in article {} with score {}".format(article, score)
-                    with open(os.path.join(self.out_dir, str(article)+".txt"), "w") as out_file:
-                        out_file.write(doc)
-                    res_list.append(article)
+                data = json.load(reut)
+            # doc_dump = core.Document.parse_tags("REUTERS", data, False)
+            # for index, doc in enumerate(doc_dump):
+            #     if index == art_index:
+            print "Found result in article {} with score {}".format(article, score)
+            with open(os.path.join(self.out_dir, str(article)+".txt"), "wb") as out_file:
+                out_file.write("The document URL is: {}\n".format(data['url']))
+                content = data['content']
+                out_file.write(content.encode("UTF-8"))
+            res_list.append(article)
         return sorted(res_list)
 
     def get_idf(self, postings):
@@ -208,7 +218,12 @@ class QueryProcessor:
 
     # Made it now return sentiment value * BM25 score to weight documents by score and sentiment
     def calculate_score(self, idf_score, frequency, docId):
-        return self.meta_info.documents[str(docId)][2] *(idf_score * ((frequency*(QueryProcessor.K_WEIGHT+1))/(frequency+QueryProcessor.K_WEIGHT*(1-QueryProcessor.B_WEIGHT + QueryProcessor.B_WEIGHT*(self.meta_info.documents[str(docId)][1]/self.meta_info.doc_length)))))
+        if self.meta_info.documents[docId][2] == 0:
+            return idf_score * ((frequency*(QueryProcessor.K_WEIGHT+1))/(frequency+QueryProcessor.K_WEIGHT*(1-QueryProcessor.B_WEIGHT + QueryProcessor.B_WEIGHT*(self.meta_info.documents[docId][1]/self.meta_info.doc_length))))
+        if self.meta_info.documents[docId][2] > 0:
+            return (self.meta_info.documents[docId][2]+1) * (idf_score * ((frequency*(QueryProcessor.K_WEIGHT+1))/(frequency+QueryProcessor.K_WEIGHT*(1-QueryProcessor.B_WEIGHT + QueryProcessor.B_WEIGHT*(self.meta_info.documents[docId][1]/self.meta_info.doc_length)))))
+        if self.meta_info.documents[docId][2] < 0:
+            return (self.meta_info.documents[docId][2]-1) * (idf_score * ((frequency*(QueryProcessor.K_WEIGHT+1))/(frequency+QueryProcessor.K_WEIGHT*(1-QueryProcessor.B_WEIGHT + QueryProcessor.B_WEIGHT*(self.meta_info.documents[docId][1]/self.meta_info.doc_length)))))
 
 
 
