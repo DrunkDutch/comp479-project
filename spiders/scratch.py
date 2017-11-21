@@ -2,6 +2,7 @@ import scrapy
 import os
 import re
 from bs4 import BeautifulSoup
+import json
 
 
 class ScratchSpider(scrapy.Spider):
@@ -27,10 +28,13 @@ class ScratchSpider(scrapy.Spider):
         # filter all text and remove blank spaces
         filteredContent = '\n'.join(filter(lambda x: not re.match(r'^\s*$', x), soup.get_text(" ").strip().encode('utf8').split('\n')))
         #create json output
+        jsondump= {}
+        jsondump['url'] = response.url
+        jsondump['content'] = filteredContent
         jsonOutput = '{"url": "'+response.url+'",\n"content": "'+filteredContent+'"\n}'
         # create new corpus files
         f = self.getResultFile()
-        f.write(jsonOutput)
+        json.dump(jsondump, f)
         # insert next urls to crawl
         counter = 0
         for url in response.xpath('//a/@href').extract():

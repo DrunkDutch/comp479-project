@@ -7,7 +7,7 @@ import cPickle as pickle
 
 
 class Inverter:
-    def __init__(self, tokens, block_prefix="bl_", block_size=100, block_index=0, out_dir="./blockfiles", senti_loc="senti.pk1"):
+    def __init__(self, tokens, block_prefix="bl_", block_size=2000, block_index=0, out_dir="./blockfiles", senti_loc="senti.pk1"):
         self.tokens = iter(tokens)
         self.block_prefix = block_prefix
         self.block_size = block_size  # Max block size in MB to simulate memory restrictions
