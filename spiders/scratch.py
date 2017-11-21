@@ -1,23 +1,30 @@
 import scrapy
 import os
 import re
+import datetime
 from bs4 import BeautifulSoup
+from scrapy.exceptions import CloseSpider
+from scrapy.spiders import Rule
+from scrapy.linkextractors import LinkExtractor
 import json
 
 
 class ScratchSpider(scrapy.Spider):
     name = "scratch"
     documentCounter = 0
+    # exclude social media, google and youtube
+    linkExtract = LinkExtractor(deny=('twitter', 'facebook', 'linkedin', 'pinterest', 'google', 'youtube'))
 
-    # should we remove external domain? Twitter is getting crawled
-    # allowed_domains= [
-    #     "csu.qc.ca",
-    #     "www.concordia.ca",
-    #     "www.cupfa.org",
-    #     "cufa.net"
-    # ]
-
+    rules = (Rule(linkExtract,callback='parse'))
+    
     def parse(self, response):
+        # check time limit
+        duration = (datetime.datetime.now() - self.timeStart)
+        if duration.total_seconds() >= self.timeLimit:
+            raise CloseSpider('Time limit reached')
+        # stop if number of documents >= limit of number of docs
+        if ScratchSpider.documentCounter >= self.docLimit:
+            raise CloseSpider('Document limit reached')
         soup = BeautifulSoup(response.text,'html')
         # remove style tags
         while soup.style:
@@ -35,18 +42,11 @@ class ScratchSpider(scrapy.Spider):
         # create new corpus files
         f = self.getResultFile()
         json.dump(jsondump, f)
+        f.close()
         # insert next urls to crawl
-        counter = 0
-        for url in response.xpath('//a/@href').extract():
-            if ScratchSpider.documentCounter + counter >= self.docLimit:
-                break
-            if 'http' not in url:
-                url = response.urljoin(url)
-            yield scrapy.Request(url, callback=self.parse)
-            counter += 1
-        yield{
-            url: response.url
-        }
+        links = self.linkExtract.extract_links(response)
+        for link in links:
+             yield scrapy.Request(link.url, callback=self.parse)
 
     def getResultFile(self):
         # if results folder doesn't exist, create it
