@@ -1,0 +1,98 @@
+Final Report COMP-479
+
+Devin Mens 26290515
+Caio Paiva 27339887
+Eric Gagnon 27387474
+
+Scrapping: Caio Paiva
+Indexing/Query: Devin Mens
+Report: Eric Gagnon
+
+[INSERT SCRAPPING SECTION HERE]
+
+Indexing Section
+
+Brief Information
+356 Documents
+2435KB index using stemming, case folding, stopword and digit removal
+4KB Meta-Data file
+18KB sentiment hash-map
+602927 Tokens
+1693 Average Document Length
+13136 Unique Terms in Index
+
+The indexing section of this project was taken from Devin Mens' submission for assignment 2 for this class with his permission (Team member).
+The following modifications were made to meet the requirements as stipulated for this project:
+    - The Document class in the "core" file was pared down due to the new simplicity of the corpus documents
+        * New corpus documents consist of JSON objects containing only the url and body of the page from scrapper (See above)
+    - Addition of a streamlined meta-data class to be serialized and stored as a file
+        * Contains:
+            ** Number of documents
+            ** Token count
+            ** Average document length
+            ** Total corpus sentiment score
+            ** hashmap/dictionary containing the following information for each document, keyed to the document id
+                *** document id, document length, document sentiment score
+
+        This was done to allow for easy sentiment analysis of the document when performing the query analysis later on. It was determined that
+        to not do this would require recreating these values from the inverted index would be a huge performance impact and the effort of traversing
+        the entire index would remove the benefit of using the index for query term matching later on. The other option was to include this information
+        within the inverted index, however, including it in such a way that does not alter the original layout and design of the index (ie: including these values
+        with the docId for each posting) would lead to an almost exponential increase in storage requirements and increased memory usage when processing queries.
+        As seen from the information provided at the top of this section, the meta data as a seperate file takes 1/10 of a percent of the storage space compared to the index.
+        This also allows us to store the metadata using a hashmap to allow for highly performant lookups to be made against the documentId.
+
+        A similar serialized hashmap was also used to store the aFINN sentiment dictionary, this reduces storage space requirements by roughly half and allows for sentiment mapping to terms to
+        be down much faster than searching the dictionary on a term by term basis at each time. This also allows for reduced overhead when performing sentiment
+        analysis on the user queries at later dates.
+
+        In regards to the enhanced inverted index, we created a new Term class that would allow for easy storage of sentiment value for a given term in the inverted index. This value is stored
+        as the first value immediatly after the term in the index to remove even the need for lookups at later dates.
+
+Query Section
+
+Similar to the indexing section, only a few minor changes were required to get the existing Query Handler provided by Devin Mens
+from his second assignment to work for this project.
+First change:
+    Implementation of loading the serialized sentiment hashmap from the indexing section as an attribute of the QueryHandler class
+        Used to calculate sentiment score of entire query
+Second Change:
+    Scoring of a given document relevant to a query has been modified to take the BM25 score for each term used in assignment 2 and multiplying it
+       by the total sentiment score of the document
+            This is done to ensure that while sentiment value of a document is of primary importance for the ranking of documents
+            it still requires the document to have an appropriate term relevancy related to the query
+    The order of the returned documents is also done based on query sentiment, with neutral or positive queries being returned in descending order
+    while negative queries are returned in ascending order.
+
+
+Observations
+
+While adding basic sentiment analysis does allow for more relevent results to be presented to the user based on similarity of sentiment,
+we feel as though there must be some better way to incorporate sentiment scores that would allow for a more complete evaluation of results for the user
+
+We believe that it would also have been interesting to compare the results from this index-based approach with more vector based approaches in regards
+to information retrieval, say using cosine similarity of document/query vectors or even cluster based systems using the same overall scoring mechanism.
+
+
+
+Sample Queries and Information
+
+All queries done using OR option as well as using stemming, stopword/digit removal and case folding
+
+1)
+funny youtube
+score =4
+128 results
+result range: [-21, 40]
+
+2)
+cold winter
+score = 0
+17 results
+result range: [33,3301]
+
+3)
+Information Retrieval
+score = 0
+237 results
+result range = [-1148,270]

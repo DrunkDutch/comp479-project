@@ -208,6 +208,7 @@ class QueryProcessor:
                 content = data['content']
                 out_file.write(content.encode("UTF-8"))
             res_list.append(article)
+        print len(res_list)
         return sorted(res_list)
 
     def get_idf(self, postings):
