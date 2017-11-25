@@ -8,7 +8,23 @@ Scrapping: Caio Paiva
 Indexing/Query: Devin Mens
 Report: Eric Gagnon
 
-[INSERT SCRAPPING SECTION HERE]
+Web Crawler Section
+
+Technologies Used:
+- Scrapy: Web Crawling Framework for Python (https://scrapy.org/)
+- Beautiful Soup 4: HTML text extraction
+
+The Web crawling can be done by running the crawler.py program. We use the 'crawlerProperties.json'
+to define the arguments to the spider crawling the web, argument include:
+    1. spiderStartUrl: list<string>: A list with the starting urls for the crawl.
+    2. spiderResult: string: The name of the folder were the corpus will be downloaded.
+    3. spiderDocumentPrefix: string: The prefix for the incremental name of documents downloaded, files will be placed inside the folder specified in the argument above.
+    4. spiderDocumentFetchLimit: Integer: The upper limit of documents that will be fetched when crawling.
+    5. spiderTimeOut: Integer: A Timeout in seconds for the crawling.
+The spider will stop crawling if 1. The document limit is reached, 2. The timeout is reached, or 3. The spider runs out of URLs to crawl.
+Robot.txt expecification are followed when using the API by running the Scrapy CrawlerProcess with the 'ROBOTSTXT_OBEY' settings flags set
+to True as specified in the Libraries Documentation (https://doc.scrapy.org/en/1.1/topics/settings.html#robotstxt-obey)
+
 
 Indexing Section
 
