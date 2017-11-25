@@ -15,8 +15,10 @@ spiderDocumentPrefix = properties['spiderDocumentPrefix']
 spiderDocumentLimit = properties['spiderDocumentFetchLimit']
 spiderTimeOut = properties['spiderTimeOut']
 
-# Create crawler process
-process = CrawlerProcess()
+# Create crawler process with robot elimination enabled
+process = CrawlerProcess({
+    'ROBOTSTXT_OBEY': True 
+})
 #start crawl
 process.crawl(ScratchSpider, 
     start_urls=spiderStartUrl, 
