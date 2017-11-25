@@ -38,7 +38,6 @@ class ScratchSpider(scrapy.Spider):
         jsondump= {}
         jsondump['url'] = response.url
         jsondump['content'] = filteredContent
-        jsonOutput = '{"url": "'+response.url+'",\n"content": "'+filteredContent+'"\n}'
         # create new corpus files
         f = self.getResultFile()
         json.dump(jsondump, f)

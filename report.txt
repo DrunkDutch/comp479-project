@@ -10,6 +10,9 @@ Report: Eric Gagnon
 
 Web Crawler Section
 
+Running the Crawler:
+python crawler.py
+
 Technologies Used:
 - Scrapy: Web Crawling Framework for Python (https://scrapy.org/)
 - Beautiful Soup 4: HTML text extraction
@@ -23,7 +26,10 @@ to define the arguments to the spider crawling the web, argument include:
     5. spiderTimeOut: Integer: A Timeout in seconds for the crawling.
 The spider will stop crawling if 1. The document limit is reached, 2. The timeout is reached, or 3. The spider runs out of URLs to crawl.
 Robot.txt expecification are followed when using the API by running the Scrapy CrawlerProcess with the 'ROBOTSTXT_OBEY' settings flags set
-to True as specified in the Libraries Documentation (https://doc.scrapy.org/en/1.1/topics/settings.html#robotstxt-obey)
+to True as specified in the Libraries Documentation (https://doc.scrapy.org/en/1.1/topics/settings.html#robotstxt-obey).
+The spider 'sctrach.py' is responsable for the crawling of webpages, extract their text and links, and generate the corpus, composed of
+the content of the page and the url so we can reaccess that page after a query.
+A black list is also defined as to avoid crawling Websites that will not give us much information such as Social medias.
 
 
 Indexing Section
