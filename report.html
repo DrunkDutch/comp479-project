@@ -1,0 +1,270 @@
+<html>
+    <head>
+        <title>COMP 479: Project 3</title>
+        <style>
+            body{
+                background-color: #F0F0F0;
+                font-family: sans-serif;
+                margin: 25px;
+                font-size: 18px;
+            }
+            h1{
+                color: #333;
+                text-align: center;
+            }
+            p{
+                text-align: justify;
+                
+            }
+            code{
+                display: inline-block;
+                background-color: #EEE;
+                padding: 7px;
+                margin-bottom: 5px;
+                margin-top: 5px;
+                font-size: 14px;
+                border-radius: 5px;
+                font-family: monospace;
+            }
+            /*group*/
+            #group ul{
+                text-align: center;
+                font-size: 25px;
+                font-family: serif;
+                list-style: none;
+                display: block;
+            }
+            #group ul li{
+                width: 33%;
+                display: inline-block;
+            }
+            /*sections*/
+            .box{
+                border: 2px solid #555;
+                border-radius: 15px;
+                margin-bottom: 20px;
+            }
+            .box h2{
+                text-align: center;
+                color:#333;
+                margin-bottom: 2px;
+                padding-left: 10px;
+            }
+            .box content{
+                color: #444;
+                display: block;
+                padding: 15px;
+                border-bottom-left-radius: 15px;
+                border-bottom-right-radius: 15px;
+                background-color: white;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Final Report COMP-479: Project 3</h1>
+        <section id="group">
+            <ul>
+                <li>Indexing/Query<br/>Devin Mens<br/>26290515</li>
+                <li>Scrapping<br/>Caio Paiva<br/>27339887</li>
+                <li>Report<br/>Eric Gagnon<br/>27387474</li>
+            </ul>
+        </section>
+        <section id="web-crawl" class="box">
+            <h2>Web Crawler Section</h2>
+            <content>
+                Running the Crawler:
+                <code>python crawler.py</code>
+        
+                <h3>Technologies Used:</h3>
+                <ul>
+                    <li><a href="https://scrapy.org/" target="_blank">Scrapy: Web Crawling Framework for Python</a></li>
+                    <li><a href="https://www.crummy.com/software/BeautifulSoup/" target="_blank">Beautiful Soup 4: HTML text extraction</a></li>
+                </ul>
+                <p>
+                The Web crawling can be done by running the crawler.py program. We use the 'crawlerProperties.json'
+                to define the arguments to the spider crawling the web, argument include:
+                    <ol>
+                        <li><code>spiderStartUrl: list{string}</code>: A list with the starting urls for the crawl.</li>
+                        <li><code>spiderResult: string</code>: The name of the folder were the corpus will be downloaded.</li>
+                        <li><code>spiderDocumentPrefix: string</code>: The prefix for the incremental name of documents downloaded, files will be placed inside the folder specified in the argument above.</li>
+                        <li><code>spiderDocumentFetchLimit: Integer</code>: The upper limit of documents that will be fetched when crawling.</li>
+                        <li><code>spiderTimeOut: Integer</code>: A Timeout in seconds for the crawling.</li>
+                
+                    </ol>
+                The spider will stop crawling if 1. The document limit is reached, 2. The timeout is reached, or 3. The spider runs out of URLs to crawl.<br/><br/>
+                Robot.txt expecification are followed when using the API by running the Scrapy CrawlerProcess with the 'ROBOTSTXT_OBEY' settings flags set
+                to True as specified in the Libraries Documentation (https://doc.scrapy.org/en/1.1/topics/settings.html#robotstxt-obey).<br/><br/>
+                The spider 'sctrach.py' is responsable for the crawling of webpages, extract their text and links, and generate the corpus, composed of
+                the content of the page and the url so we can reaccess that page after a query.<br/><br/>
+                A black list is also defined as to avoid crawling Websites that will not give us much information such as Social medias. <br/>             
+                </p>
+            </content>
+        </section>
+        
+        <section id="web-crawl" class="box">
+            <h2>Indexing Section</h2>
+            <content>
+                <p>
+                    To run the indexer against a given corpus, the corpus must be located in a directory named "Corpus" located directly adjacent
+                    to the comp479-core folder that contains the code. The code is run by calling the spimi.py script with the desired parameters
+                    as specified by its help command.
+                </p>
+                    Example: <code>python spimi.py -S 2000 -s -d -c -m</code>
+                <p>
+                    This would run the indexer with a memory blocksize of 2000KB, with stemming, case-folding, and stopword and digit removal.
+                </p>
+                    <h3>Brief Information</h3>
+                    <ul>
+                            <li>356 Documents</li>
+                            <li>2435KB index using stemming, case folding, stopword and digit removal</li>
+                            <li>4KB Meta-Data file</li>
+                            <li>18KB sentiment hash-map</li>
+                            <li>602927 Tokens</li>
+                            <li>1693 Average Document Length</li>
+                            <li>13136 Unique Terms in Index</li>
+                    </ul>
+                    
+                <p>
+                    The indexing section of this project was taken from Devin Mens' submission for assignment 2 for this class with his permission (Team member).
+                    <br/>The following modifications were made to meet the requirements as stipulated for this project:
+                </p>
+                <ul>
+                    <li>
+                        The Document class in the "core" file was pared down due to the new simplicity of the corpus documents.
+                        <ul>
+                            <li>
+                                 New corpus documents consist of JSON objects containing only the url and body of the page from scrapper (See above).                                    
+                            </li>
+                        </ul>                            
+                    </li>
+                    <li>
+                        Addition of a streamlined meta-data class to be serialized and stored as a file
+                        <br/>Contains:
+                        <ul>
+                            <li>Number of documents</li>
+                            <li>Token count</li>
+                            <li>Average document length</li>
+                            <li>Total corpus sentiment score</li>
+                            <li>hashmap/dictionary containing the following information for each document, keyed to the document id</li>
+                            <li>document id, document length, document sentiment score</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p>
+                            This was done to allow for easy sentiment analysis of the document when performing the query analysis later on. It was determined that
+                            to not do this would require recreating these values from the inverted index would be a huge performance impact and the effort of traversing
+                            the entire index would remove the benefit of using the index for query term matching later on. The other option was to include this information
+                            within the inverted index, however, including it in such a way that does not alter the original layout and design of the index (ie: including these values
+                            with the docId for each posting) would lead to an almost exponential increase in storage requirements and increased memory usage when processing queries.
+                            As seen from the information provided at the top of this section, the meta data as a seperate file takes 1/10 of a percent of the storage space compared to the index.
+                            This also allows us to store the metadata using a hashmap to allow for highly performant lookups to be made against the documentId.
+                </p>
+                <p>
+                            A similar serialized hashmap was also used to store the aFINN sentiment dictionary, this reduces storage space requirements by roughly half and allows for sentiment mapping to terms to
+                            be down much faster than searching the dictionary on a term by term basis at each time. This also allows for reduced overhead when performing sentiment
+                            analysis on the user queries at later dates.
+                </p>
+                <p>
+                            In regards to the enhanced inverted index, we created a new Term class that would allow for easy storage of sentiment value for a given term in the inverted index. This value is stored
+                            as the first value immediatly after the term in the index to remove even the need for lookups at later dates.
+                </p>
+
+            </content>
+        </section>
+        
+
+        <section id="query" class="box">
+            <h2>Query Section</h2>
+            <content>
+                <p>
+                    To run a query against the index, it is done by simply calling the query.py script with the desired parameters as shown below:
+                    <br/><code>python query.py -o -q "student strike" -s -d -c -m</code>
+                </p>
+                <p>
+                    This runs the script using the OR flag against the query "student strike" using stemming, case-folding and stopword and digit removal.<br/>
+                    This script will then output to console the resulting documents with their score and ranking and outputs the results as text files
+                    in the <code>./output</code> folder located in the <code>comp479-core</code> directory.
+                </p>
+                <p>
+                    Similar to the indexing section, only a few minor changes were required to get the existing Query Handler provided by Devin Mens
+                    from his second assignment to work for this project.
+                </p>
+                <ul>
+                    <li>
+                        First change:
+                        <ul>
+                        <li>
+                                Implementation of loading the serialized sentiment hashmap from the indexing section as an attribute of the QueryHandler class
+                                Used to calculate sentiment score of entire query.
+                        </li>
+                        </ul>
+                    </li>
+                    <li>
+                            Second Change:
+                            <ul>
+                                <li>
+                                        Scoring of a given document relevant to a query has been modified to take the BM25 score for each term used in assignment 2 and multiplying it
+                                        by the total sentiment score of the document.
+                                        <ul>
+                                            <li>
+                                                This is done to ensure that while sentiment value of a document is of primary importance for the ranking of documents
+                                                it still requires the document to have an appropriate term relevancy related to the query.
+                                            </li>
+                                        </ul>
+                                        The order of the returned documents is also done based on query sentiment, with neutral or positive queries being returned in descending order
+                                        while negative queries are returned in ascending order.
+                                </li>
+                            </ul>
+                            
+                    </li> 
+                    
+                </ul>
+                   
+            </content>
+        </section>
+        <section id="observations" class="box">
+            <h2>Observations</h2>
+            <content>
+                <p>
+                    While adding basic sentiment analysis does allow for more relevent results to be presented to the user based on similarity of sentiment,
+                    we feel as though there must be some better way to incorporate sentiment scores that would allow for a more complete evaluation of results for the user.
+                </p>
+                <p>
+                    We believe that it would also have been interesting to compare the results from this index-based approach with more vector based approaches in regards
+                    to information retrieval, say using cosine similarity of document/query vectors or even cluster based systems using the same overall scoring mechanism.
+                </p>
+            </content>
+        </section>
+        <section id="sample-queries" class="box">
+            <h2>Sample Queries and Information</h2>
+            <content>
+                All queries done using OR option as well as using stemming, stopword/digit removal and case folding.
+                    
+                <pre>
+1)
+funny youtube
+score =4
+128 results
+result range: [-21, 40]
+
+2)
+cold winter
+score = 0
+17 results
+result range: [33,3301]
+
+3)
+Information Retrieval
+score = 0
+237 results
+result range = [-1148,270]
+                </pre>
+            </content>
+        </section>
+
+
+        
+
+        
+    </body>
+</html>
