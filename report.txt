@@ -12,6 +12,14 @@ Report: Eric Gagnon
 
 Indexing Section
 
+To run the indexer against a given corpus, the corpus must be located in a directory named "Corpus" located directly adjacent
+to the comp479-core folder that contains the code. The code is run by calling the spimi.py script with the desired parameters
+as specified by its help command.
+
+Example: python spimi.py -S 2000 -s -d -c -m
+
+This would run the indexer with a memory blocksize of 2000KB, with stemming, case-folding, and stopword and digit removal.
+
 Brief Information
 356 Documents
 2435KB index using stemming, case folding, stopword and digit removal
@@ -50,6 +58,13 @@ The following modifications were made to meet the requirements as stipulated for
         as the first value immediatly after the term in the index to remove even the need for lookups at later dates.
 
 Query Section
+
+To run a query against the index, it is done by simply calling the query.py script with the desired parameters as shown below:
+python query.py -o -q "student strike" -s -d -c -m
+
+This runs the script using the OR flag against the query "student strike" using stemming, case-folding and stopword and digit removal.
+This script will then output to console the resulting documents with their score and ranking and outputs the results as text files
+in the ./output folder located in the comp479-core directory
 
 Similar to the indexing section, only a few minor changes were required to get the existing Query Handler provided by Devin Mens
 from his second assignment to work for this project.
