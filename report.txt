@@ -43,13 +43,13 @@ Example: python spimi.py -S 2000 -s -d -c -m
 This would run the indexer with a memory blocksize of 2000KB, with stemming, case-folding, and stopword and digit removal.
 
 Brief Information
-356 Documents
-2435KB index using stemming, case folding, stopword and digit removal
-4KB Meta-Data file
+1000 Documents
+5745KB index using stemming, case folding, stopword and digit removal
+12KB Meta-Data file
 18KB sentiment hash-map
-602927 Tokens
-1693 Average Document Length
-13136 Unique Terms in Index
+1321488 Tokens
+1321 Average Document Length
+63600 Unique Terms in Index
 
 The indexing section of this project was taken from Devin Mens' submission for assignment 2 for this class with his permission (Team member).
 The following modifications were made to meet the requirements as stipulated for this project:
@@ -119,17 +119,17 @@ All queries done using OR option as well as using stemming, stopword/digit remov
 1)
 funny youtube
 score =4
-128 results
-result range: [-21, 40]
+202 results
+result range: [-361, 1577]
 
 2)
 cold winter
 score = 0
-17 results
-result range: [33,3301]
+94 results
+result range: [-410,566]
 
 3)
 Information Retrieval
 score = 0
-237 results
-result range = [-1148,270]
+584 results
+result range = [-659,459]

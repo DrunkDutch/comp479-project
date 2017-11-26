@@ -8,5 +8,5 @@
     "spiderResult": "./corpus",
     "spiderDocumentPrefix": "corpus",
     "spiderDocumentFetchLimit": 1000,
-    "spiderTimeOut": 120
+    "spiderTimeOut": 600
 }
